@@ -1,131 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Outfit Rating App</title>
-	<style>
-		.container {
-			max-width: 600px;
-			margin: 0 auto;
-			text-align: center;
-		}
+  <title>Color Palette App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
 
-		h1 {
-			font-size: 36px;
-			margin-bottom: 30px;
-		}
+    h1 {
+      text-align: center;
+    }
 
-		form {
-			margin-bottom: 30px;
-		}
+    .color-input {
+      margin-bottom: 20px;
+    }
 
-		label {
-			display: block;
-			margin-bottom: 10px;
-			font-size: 18px;
-		}
+    .color-palette {
+      text-align: center;
+    }
 
-		input[type="file"] {
-			display: block;
-			margin: 0 auto;
-			margin-bottom: 20px;
-		}
+    #palette {
+      display: flex;
+      justify-content: center;
+    }
 
-		#image-preview {
-			margin-bottom: 20px;
-		}
-
-		#score {
-			font-size: 24px;
-			font-weight: bold;
-		}
-	</style>
+    .color-box {
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-	<div class="container">
-		<h1>Outfit Rating App</h1>
-		<form>
-			<label for="image-upload">Upload an outfit picture:</label>
-			<input type="file" id="image-upload" name="image-upload" accept="image/*">
-			<button type="submit" id="submit-btn">Rate Outfit</button>
-		</form>
-		<div id="score"></div>
-		<div id="image-preview"></div>
+  <h1>Color Palette App</h1>
 
-	</div>
-	<script>
-const imageUpload = document.getElementById('image-upload');
-const imagePreview = document.getElementById('image-preview');
-const score = document.getElementById('score');
+  <div class="color-input">
+    <label for="base-color">Base Color:</label>
+    <input type="color" id="base-color">
+    <button onclick="generatePalette()">Generate Palette</button>
+  </div>
 
-imageUpload.addEventListener('change', function() {
-  const file = imageUpload.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.addEventListener('load', function() {
-      imagePreview.innerHTML = `<img src="${reader.result}" width="300">`;
-    });
-  }
-});
+  <div class="color-palette">
+    <h2>Color Palette:</h2>
+    <div id="palette"></div>
+  </div>
 
-const submitBtn = document.getElementById('submit-btn');
-submitBtn.addEventListener('click', function(e) {
-  e.preventDefault();
-  const file = imageUpload.files[0];
-  if (file) {
-    // Call function to rate the outfit and display the score
-    const outfitScore = rateOutfit();
-    score.innerHTML = `Outfit Score: ${outfitScore}%`;
-  } else {
-    alert('Please select an image file!');
-  }
-});
+  <script>
+    function generatePalette() {
+      var baseColor = document.getElementById("base-color").value;
+      var palette = document.getElementById("palette");
 
-function rateOutfit() {
-  // Get the image data from the image preview
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  const img = document.querySelector('img');
-  canvas.width = img.width;
-  canvas.height = img.height;
-  context.drawImage(img, 0, 0);
-  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      // Clear existing palette
+      palette.innerHTML = "";
 
-  // Calculate the average color of the outfit
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  let totalPixels = 0;
-  for (let i = 0; i < imageData.data.length; i += 4) {
-    // Skip transparent pixels
-    if (imageData.data[i + 3] === 0) {
-      continue;
+      // Generate color combinations
+      var colors = generateColors(baseColor, 5);
+
+      // Display color palette
+      colors.forEach(function(color) {
+        var colorBox = document.createElement("div");
+        colorBox.className = "color-box";
+        colorBox.style.backgroundColor = color;
+        palette.appendChild(colorBox);
+      });
     }
-    r += imageData.data[i];
-    g += imageData.data[i + 1];
-    b += imageData.data[i + 2];
-    totalPixels++;
-  }
-  const avgR = Math.floor(r / totalPixels);
-  const avgG = Math.floor(g / totalPixels);
-  const avgB = Math.floor(b / totalPixels);
 
-  // Calculate the color difference from a "perfect" outfit color
-  const perfectR = 255;
-  const perfectG = 255;
-  const perfectB = 255;
-  const colorDiff = Math.sqrt((avgR - perfectR) ** 2 + (avgG - perfectG) ** 2 + (avgB - perfectB) ** 2);
+    function generateColors(baseColor, count) {
+      // Generate colors using your chosen algorithm or library
+      // Here's a simple example that generates random colors
+      var colors = [];
 
-  // Calculate the score based on the color difference
-  const maxDiff = Math.sqrt((255 - 0) ** 2 + (255 - 0) ** 2 + (255 - 0) ** 2);
-  const score = 100 - Math.floor((colorDiff / maxDiff) * 100);
+      for (var i = 0; i < count; i++) {
+        var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        colors.push(randomColor);
+      }
 
-  // Return the score
-  return score;
-}
-
-
-		
-	</script>
+      return colors;
+    }
+  </script>
 </body>
 </html>
