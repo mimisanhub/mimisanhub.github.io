@@ -1,137 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Color Palette App</title>
+  <title>Advanced Drawing App</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: white;
+    #canvas {
+      border: 1px solid black;
+      width: 100vw;
+      height: 600px;
     }
-
-    h1 {
-      text-align: center;
-    }
-
-    .color-input {
-      margin-bottom: 20px;
-    }
-
-    .color-palette {
-      text-align: center;
-    }
-
-    #palette {
-      display: flex;
-      justify-content: center;
-    }
-
-    .color-box {
-      width: 100px;
-      height: 100px;
-      margin: 10px;
-      border-radius: 4px;
-      border: 1px solid transparent;
-    }
-
-    .color-box-white {
-      border-color: gray;
-    }
-
-    .selected-color {
-      margin-top: 20px;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    .palette-name {
-      margin-top: 20px;
-      text-align: center;
-      font-weight: bold;
+    #controls {
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Color Palette App</h1>
-
-  <div class="color-input">
-    <label for="base-color">Base Color:</label>
-    <input type="color" id="base-color" onchange="updateBaseColor()">
-    <button onclick="generatePalette()">Generate Palette</button>
+  <canvas id="canvas"></canvas>
+  
+  <div id="controls">
+    <label for="brushSize">Brush Size:</label>
+    <input type="range" id="brushSize" min="1" max="20" value="5">
+  
+    <label for="brushColor">Brush Color:</label>
+    <input type="color" id="brushColor" value="#000000">
+  
+    <label for="opacity">Opacity:</label>
+    <input type="range" id="opacity" min="0" max="1" step="0.1" value="1">
+  
+    <button id="eraser">Eraser</button>
+    <button id="clear">Clear</button>
   </div>
-
-  <div class="color-palette">
-    <h2>Color Palette:</h2>
-    <div id="palette"></div>
-  </div>
-
-  <div id="selected-color" class="selected-color"></div>
-  <div id="palette-name" class="palette-name"></div>
-
+  
   <script>
-    var baseColorElement = document.getElementById("base-color");
-    var selectedColorElement = document.getElementById("selected-color");
-    var paletteNameElement = document.getElementById("palette-name");
-    var baseColor = "";
-
-    function updateBaseColor() {
-      baseColor = baseColorElement.value;
+    // Get the canvas element
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size
+    canvas.width = window.innerWidth;
+    canvas.height = 600;
+    
+    // Variables to store mouse position
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+  
+    // Set initial brush properties
+    let brushSize = 5;
+    let brushColor = '#000000';
+    let opacity = 1;
+    let isEraser = false;
+  
+    // Function to start drawing
+    function startDrawing(e) {
+      isDrawing = true;
+      [lastX, lastY] = [e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop];
     }
-
-    function generatePalette() {
-        var palette = document.getElementById("palette");
-
-        // Clear existing palette
-        palette.innerHTML = "";
-
-        // Retrieve the selected base color
-        var baseColor = baseColorElement.value;
-
-        // Display the base color
-        var baseColorBox = document.createElement("div");
-        baseColorBox.className = "color-box";
-        baseColorBox.style.backgroundColor = baseColor;
-        palette.appendChild(baseColorBox);
-
-        // Generate color combinations
-        var colors = generateColors(baseColor, 4);
-
-        // Display color palette
-        colors.forEach(function(color) {
-          var colorBox = document.createElement("div");
-          colorBox.className = "color-box";
-          colorBox.style.backgroundColor = color;
-
-          if (color === "#ffffff") {
-            colorBox.classList.add("color-box-white");
-          }
-
-          palette.appendChild(colorBox);
-        });
-
-        selectedColorElement.textContent = "Selected Color: " + baseColor;
-        paletteNameElement.textContent = "Palette Name: " + generatePaletteName();
-      }
-
-    function generateColors(baseColor, count) {
-      var colors = [];
-
-      for (var i = 0; i < count; i++) {
-        var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-        colors.push(randomColor);
-      }
-
-      return colors;
+  
+    // Function to stop drawing
+    function stopDrawing() {
+      isDrawing = false;
     }
-
-    function generatePaletteName() {
-      var adjectives = ["Vibrant", "Mellow", "Soothing", "Playful", "Elegant", "Whimsical", "Serene", "Dynamic", "Harmonious", "Enchanting"];
-      var nouns = ["Dream", "Bliss", "Mood", "Charm", "Delight", "Fantasy", "Glee", "Wonder", "Ecstasy", "Magic"];
-      var adjectiveIndex = Math.floor(Math.random() * adjectives.length);
-      var nounIndex = Math.floor(Math.random() * nouns.length);
-      return adjectives[adjectiveIndex] + " " + nouns[nounIndex];
+  
+    // Function to draw lines
+    function draw(e) {
+      if (!isDrawing) return;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      ctx.strokeStyle = isEraser ? 'white' : brushColor;
+      ctx.lineWidth = brushSize;
+      ctx.globalAlpha = opacity;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      [lastX, lastY] = [e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop];
     }
+  
+    // Function to clear the canvas
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  
+    // Event listener for brush size change
+    const brushSizeInput = document.getElementById('brushSize');
+    brushSizeInput.addEventListener('input', function() {
+      brushSize = this.value;
+    });
+  
+    // Event listener for brush color change
+    const brushColorInput = document.getElementById('brushColor');
+    brushColorInput.addEventListener('input', function() {
+      brushColor = this.value;
+    });
+  
+    // Event listener for opacity change
+    const opacityInput = document.getElementById('opacity');
+    opacityInput.addEventListener('input', function() {
+      opacity = this.value;
+    });
+  
+    // Event listener for eraser button
+    const eraserButton = document.getElementById('eraser');
+    eraserButton.addEventListener('click', function() {
+      isEraser = !isEraser;
+      eraserButton.textContent = isEraser ? 'Brush' : 'Eraser';
+    });
+  
+    // Event listener for clear button
+    const clearButton = document.getElementById('clear');
+    clearButton.addEventListener('click', clearCanvas);
+  
+    // Attach event listeners to the canvas
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
   </script>
 </body>
 </html>
