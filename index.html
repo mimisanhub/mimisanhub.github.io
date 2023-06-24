@@ -1,118 +1,232 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Advanced Drawing App</title>
+  <title>Paint App</title>
   <style>
-    #canvas {
-      border: 1px solid black;
-      width: 100vw;
-      height: 600px;
+    body {
+      margin: 0;
+      padding: 0;
     }
+
+    #homeScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    #canvas {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      background-color: white;
+      cursor: crosshair;
+    }
+
     #controls {
-      margin-top: 10px;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-color: #f0f0f0;
+      z-index: 1;
+    }
+
+    #controls select,
+    #controls input {
+      margin: 0 10px;
+    }
+
+    #controls label {
+      font-size: 14px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
+  <div id="homeScreen">
+    <h1>Welcome to Paint App</h1>
+    <button id="startButton">Start Drawing</button>
+  </div>
   <canvas id="canvas"></canvas>
-  
   <div id="controls">
+    <select id="toolSelect">
+      <option value="brush">Brush</option>
+      <option value="eraser">Eraser</option>
+      <option value="fill">Fill</option>
+    </select>
     <label for="brushSize">Brush Size:</label>
-    <input type="range" id="brushSize" min="1" max="20" value="5">
-  
+    <input type="range" id="brushSize" min="1" max="50" value="10">
     <label for="brushColor">Brush Color:</label>
     <input type="color" id="brushColor" value="#000000">
-  
     <label for="opacity">Opacity:</label>
     <input type="range" id="opacity" min="0" max="1" step="0.1" value="1">
-  
-    <button id="eraser">Eraser</button>
-    <button id="clear">Clear</button>
+    <button id="clearButton">Clear Canvas</button>
+    <button id="saveButton">Save Image</button>
   </div>
-  
+
   <script>
-    // Get the canvas element
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    
-    // Set canvas size
-    canvas.width = window.innerWidth;
-    canvas.height = 600;
-    
-    // Variables to store mouse position
+
     let isDrawing = false;
     let lastX = 0;
     let lastY = 0;
-  
-    // Set initial brush properties
-    let brushSize = 5;
+    let isEraser = false;
+    let isFillMode = false;
+    let brushSize = 10;
     let brushColor = '#000000';
     let opacity = 1;
-    let isEraser = false;
-  
-    // Function to start drawing
+
     function startDrawing(e) {
       isDrawing = true;
-      [lastX, lastY] = [e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop];
+      [lastX, lastY] = [e.clientX, e.clientY];
     }
-  
-    // Function to stop drawing
+
     function stopDrawing() {
       isDrawing = false;
     }
-  
-    // Function to draw lines
+
     function draw(e) {
       if (!isDrawing) return;
+
+      if (isFillMode) {
+        fillCanvas(e.clientX, e.clientY);
+        return;
+      }
+
       ctx.beginPath();
       ctx.moveTo(lastX, lastY);
-      ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      ctx.lineTo(e.clientX, e.clientY);
       ctx.strokeStyle = isEraser ? 'white' : brushColor;
       ctx.lineWidth = brushSize;
       ctx.globalAlpha = opacity;
       ctx.lineCap = 'round';
       ctx.stroke();
-      [lastX, lastY] = [e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop];
+      [lastX, lastY] = [e.clientX, e.clientY];
     }
-  
-    // Function to clear the canvas
+
     function clearCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-  
-    // Event listener for brush size change
-    const brushSizeInput = document.getElementById('brushSize');
-    brushSizeInput.addEventListener('input', function() {
-      brushSize = this.value;
-    });
-  
-    // Event listener for brush color change
-    const brushColorInput = document.getElementById('brushColor');
-    brushColorInput.addEventListener('input', function() {
-      brushColor = this.value;
-    });
-  
-    // Event listener for opacity change
-    const opacityInput = document.getElementById('opacity');
-    opacityInput.addEventListener('input', function() {
-      opacity = this.value;
-    });
-  
-    // Event listener for eraser button
-    const eraserButton = document.getElementById('eraser');
-    eraserButton.addEventListener('click', function() {
-      isEraser = !isEraser;
-      eraserButton.textContent = isEraser ? 'Brush' : 'Eraser';
-    });
-  
-    // Event listener for clear button
-    const clearButton = document.getElementById('clear');
-    clearButton.addEventListener('click', clearCanvas);
-  
-    // Attach event listeners to the canvas
+
+    function fillCanvas(x, y) {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixelStack = [[x, y]];
+      const fillColor = hexToRgb(brushColor);
+
+      const targetColor = getPixelColor(imageData, x, y);
+      if (colorsMatch(targetColor, fillColor)) return;
+
+      while (pixelStack.length) {
+        const newPos = pixelStack.pop();
+        const [nx, ny] = newPos;
+
+        const currentColor = getPixelColor(imageData, nx, ny);
+        if (colorsMatch(currentColor, targetColor)) {
+          setPixelColor(imageData, nx, ny, fillColor);
+
+          pixelStack.push([nx + 1, ny]);
+          pixelStack.push([nx - 1, ny]);
+          pixelStack.push([nx, ny + 1]);
+          pixelStack.push([nx, ny - 1]);
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    function getPixelColor(imageData, x, y) {
+      const offset = (y * imageData.width + x) * 4;
+      return [
+        imageData.data[offset],
+        imageData.data[offset + 1],
+        imageData.data[offset + 2],
+        imageData.data[offset + 3]
+      ];
+    }
+
+    function setPixelColor(imageData, x, y, color) {
+      const offset = (y * imageData.width + x) * 4;
+      imageData.data[offset] = color[0];
+      imageData.data[offset + 1] = color[1];
+      imageData.data[offset + 2] = color[2];
+      imageData.data[offset + 3] = color[3];
+    }
+
+    function colorsMatch(color1, color2) {
+      return (
+        color1[0] === color2[0] &&
+        color1[1] === color2[1] &&
+        color1[2] === color2[2] &&
+        color1[3] === color2[3]
+      );
+    }
+
+    function hexToRgb(hex) {
+      const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+      hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result
+        ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16),
+            255
+          ]
+        : null;
+    }
+
+    function selectTool() {
+      const toolSelect = document.getElementById('toolSelect');
+      const selectedTool = toolSelect.options[toolSelect.selectedIndex].value;
+
+      isEraser = selectedTool === 'eraser';
+      isFillMode = selectedTool === 'fill';
+    }
+
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mouseup', stopDrawing);
     canvas.addEventListener('mousemove', draw);
+
+    document.getElementById('clearButton').addEventListener('click', clearCanvas);
+    document.getElementById('saveButton').addEventListener('click', () => {
+      const dataURL = canvas.toDataURL();
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'drawing.png';
+      link.click();
+    });
+
+    document.getElementById('brushSize').addEventListener('input', (e) => {
+      brushSize = e.target.value;
+    });
+
+    document.getElementById('brushColor').addEventListener('input', (e) => {
+      brushColor = e.target.value;
+    });
+
+    document.getElementById('opacity').addEventListener('input', (e) => {
+      opacity = e.target.value;
+    });
+
+    document.getElementById('startButton').addEventListener('click', () => {
+      const homeScreen = document.getElementById('homeScreen');
+      const canvas = document.getElementById('canvas');
+      const controls = document.getElementById('controls');
+
+      homeScreen.style.display = 'none';
+      canvas.style.display = 'block';
+      controls.style.display = 'flex';
+    });
+
+    document.getElementById('toolSelect').addEventListener('change', selectTool);
   </script>
 </body>
 </html>
