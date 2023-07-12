@@ -56,8 +56,8 @@
 </head>
 <body>
   <div id="homeScreen">
-    <h1>Welcome to Painting App</h1>
-    <button id="startButton">Start Drawing</button>
+    <h1>Welcome to a Painting App</h1>
+    <button id="startButton">start drawing</button>
   </div>
   <canvas id="canvas"></canvas>
   <div id="controls">
@@ -102,9 +102,17 @@
         return;
       }
 
+      if (isEraser) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = brushSize;
+        ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = brushColor;
+        ctx.lineWidth = brushSize;
+      }
+
       ctx.lineTo(x, y);
-      ctx.strokeStyle = isEraser ? 'white' : brushColor;
-      ctx.lineWidth = brushSize;
       ctx.globalAlpha = opacity;
       ctx.lineCap = 'round';
       ctx.stroke();
