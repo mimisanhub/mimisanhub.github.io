@@ -1,62 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Painting App</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "georgia", cursive;
-    }
-
-    #homeScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #b5eaff;
-    }
-
-    #canvas {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgb(255, 255, 255);
-      cursor: crosshair;
-    }
-
-    #controls {
-      display: none;
-      justify-content: center;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background-color: #e3e3e3;
-      z-index: 1;
-    }
-
-    #controls select,
-    #controls input {
-      margin: 0 10px;
-    }
-
-    #controls label {
-      font-size: 14px;
-      font-weight: bold;
-    }
-  </style>
+  <title>Paint App</title>
   <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="index.css" rel="stylesheet">
+
 </head>
 <body>
   <div id="homeScreen">
-    <h1>Welcome to a Painting App</h1>
+    <h1>Welcome to Paint App</h1>
     <button id="startButton">start drawing</button>
   </div>
   <canvas id="canvas"></canvas>
@@ -102,17 +54,9 @@
         return;
       }
 
-      if (isEraser) {
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = brushSize;
-        ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
-      } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = brushColor;
-        ctx.lineWidth = brushSize;
-      }
-
       ctx.lineTo(x, y);
+      ctx.strokeStyle = isEraser ? 'white' : brushColor;
+      ctx.lineWidth = brushSize;
       ctx.globalAlpha = opacity;
       ctx.lineCap = 'round';
       ctx.stroke();
