@@ -4,7 +4,6 @@
   <title>Paint App</title>
   <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
   <link href="index.css" rel="stylesheet">
-
 </head>
 <body>
   <div id="homeScreen">
@@ -41,6 +40,7 @@
 
     function startDrawing(e) {
       isDrawing = true;
+      ctx.beginPath(); // Start a new path
       draw(e.clientX, e.clientY);
     }
 
@@ -54,8 +54,14 @@
         return;
       }
 
+      if (isEraser) {
+        ctx.globalCompositeOperation = 'destination-out';
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
       ctx.lineTo(x, y);
-      ctx.strokeStyle = isEraser ? 'white' : brushColor;
+      ctx.strokeStyle = brushColor;
       ctx.lineWidth = brushSize;
       ctx.globalAlpha = opacity;
       ctx.lineCap = 'round';
