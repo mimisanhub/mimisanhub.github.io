@@ -182,6 +182,8 @@
       opacity = e.target.value;
     });
 
+    document.getElementById('toolSelect').addEventListener('change', selectTool);
+
     document.getElementById('startButton').addEventListener('click', () => {
       const homeScreen = document.getElementById('homeScreen');
       const controls = document.getElementById('controls');
