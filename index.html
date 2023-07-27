@@ -64,6 +64,10 @@
       font-size: 14px;
       font-weight: bold;
     }
+
+    #controls button {
+      margin: 0 5px;
+    }
   </style>
   <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
 </head>
@@ -93,6 +97,10 @@
     <input type="range" id="opacity" min="0" max="1" step="0.1" value="1">
     <button id="clearButton">Clear Canvas</button>
     <button id="saveButton">Save Image</button>
+    <button id="shapeCircleButton">Circle</button>
+    <button id="shapeSquareButton">Square</button>
+    <button id="shapeRectangleButton">Rectangle</button>
+    <button id="shapeTriangleButton">Triangle</button>
   </div>
 
   <script>
@@ -102,23 +110,61 @@
     let isDrawing = false;
     let isEraser = false;
     let isFillMode = false;
+    let isDrawingShape = false;
+    let selectedShape = null;
     let brushSize = 10;
     let brushColor = '#000000';
     let opacity = 1;
+    let startX, startY;
 
     function startDrawing(e) {
+      if (isDrawingShape) {
+        startX = e.clientX;
+        startY = e.clientY;
+        return;
+      }
+
       isDrawing = true;
-      ctx.beginPath(); // Start a new path
+      ctx.beginPath();
       draw(e.clientX, e.clientY);
     }
 
     function stopDrawing() {
+      if (isDrawingShape) {
+        isDrawingShape = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        draw(startX, startY);
+        return;
+      }
+
       isDrawing = false;
     }
 
     function draw(x, y) {
       if (isFillMode) {
         fillCanvas(x, y);
+        return;
+      }
+
+      if (isDrawingShape) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        switch (selectedShape) {
+          case 'circle':
+            drawCircle(x, y);
+            break;
+          case 'square':
+            drawSquare(x, y);
+            break;
+          case 'rectangle':
+            drawRectangle(x, y);
+            break;
+          case 'triangle':
+            drawTriangle(x, y);
+            break;
+          default:
+            break;
+        }
         return;
       }
 
@@ -135,10 +181,6 @@
       ctx.globalAlpha = opacity;
       ctx.lineCap = 'round';
       ctx.stroke();
-    }
-
-    function clearCanvas() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     function fillCanvas(x, y) {
@@ -165,6 +207,33 @@
       }
 
       ctx.putImageData(imageData, 0, 0);
+    }
+
+    function drawCircle(x, y) {
+      const radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+      ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
+
+    function drawSquare(x, y) {
+      const size = Math.max(Math.abs(x - startX), Math.abs(y - startY));
+      ctx.rect(startX, startY, size, size);
+      ctx.stroke();
+    }
+
+    function drawRectangle(x, y) {
+      const width = Math.abs(x - startX);
+      const height = Math.abs(y - startY);
+      ctx.rect(startX, startY, width, height);
+      ctx.stroke();
+    }
+
+    function drawTriangle(x, y) {
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(startX, y);
+      ctx.lineTo(x, y);
+      ctx.closePath();
+      ctx.stroke();
     }
 
     function getPixelColor(imageData, x, y) {
@@ -251,7 +320,10 @@
       }
     });
 
-    document.getElementById('clearButton').addEventListener('click', clearCanvas);
+    document.getElementById('clearButton').addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
     document.getElementById('saveButton').addEventListener('click', () => {
       const dataURL = canvas.toDataURL();
       const link = document.createElement('a');
@@ -294,5 +366,5 @@
       canvas.height = window.innerHeight;
     });
   </script>
-</body>
+</body>   
 </html>
