@@ -2,148 +2,114 @@
 <head>
   <title>Paint App</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "georgia", cursive;
-    }
+   body {
+  margin: 0;
+  padding: 0;
+  font-family: "georgia", cursive;
+  background-color: #b5eaff
+}
 
-    #homeScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #b5eaff;
-    }
+#homeScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #b5eaff;
+}
 
-    #loginContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+#canvas {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(255, 255, 255);
+  cursor: crosshair;
+}
 
-    #loginContainer input {
-      margin-bottom: 10px;
-      padding: 5px;
-      width: 200px;
-    }
+#controls {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #e3e3e3;
+  z-index: 1;
+}
 
-    #canvas {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgb(255, 255, 255);
-      cursor: crosshair;
-    }
+#controls select,
+#controls input {
+  margin: 0 10px;
+}
 
-    #controls {
-      display: none;
-      justify-content: center;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background-color: #e3e3e3;
-      z-index: 1;
-    }
+#controls label {
+  font-size: 14px;
+  font-weight: bold;
+}
 
-    #controls select,
-    #controls input {
-      margin: 0 10px;
-    }
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #b5eaff;
+}
 
-    #controls label {
-      font-size: 14px;
-      font-weight: bold;
-    }
+.box {
+  margin-top: 20px;
+}
+
+.box button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.box button:hover {
+  background-color: #45a049;
+}
+
+/* Additional styles for the login form */
+#loginContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#loginContainer input {
+  margin-bottom: 10px;
+  padding: 5px;
+  width: 200px;
+}
   </style>
-  <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
-  <link href="index.css" rel="stylesheet">
+
 </head>
+
 <body>
-  <div id="homeScreen">
-    <h1>Welcome to Paint App</h1>
-    <button id="startButton">start drawing</button>
-    <div id="loginContainer">
-      <input type="text" id="username" placeholder="Username">
-      <input type="password" id="password" placeholder="Password">
-      <button id="loginButton">Login</button>
-      <button id="registerLoginButton">Register</button>
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
+    <h1>Welcome to Paint app</h1>
+    <div class="box">
+      <button onclick="goToLogin()">Login</button>
     </div>
-    <button id="startButton" disabled>start drawing</button>
-  </div>
+    
+    <script>
+      function goToLogin() {
+        window.location.href = 'login.html';
+      }
+    </script>
   <canvas id="canvas"></canvas>
   <div id="controls">
-@@ -56,12 +124,13 @@ <h1>Welcome to Paint App</h1>
 
-      if (isEraser) {
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.strokeStyle = 'white';
-      } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = brushColor;
-      }
-
-      ctx.lineTo(x, y);
-      ctx.strokeStyle = brushColor;
-      ctx.lineWidth = brushSize;
-      ctx.globalAlpha = opacity;
-      ctx.lineCap = 'round';
-@@ -147,6 +216,27 @@ <h1>Welcome to Paint App</h1>
-      isFillMode = selectedTool === 'fill';
-    }
-
-    function handleLogin() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      if (username === 'admin' && password === 'password') {
-        document.getElementById('startButton').disabled = false;
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
-        document.getElementById('username').disabled = true;
-        document.getElementById('password').disabled = true;
-        document.getElementById('loginButton').disabled = true;
-        document.getElementById('registerLoginButton').disabled = true;
-      } else {
-        alert('Invalid username or password. Please try again.');
-      }
-    }
-
-    function redirectToRegister() {
-      window.location.href = 'register.html';
-    }
-
-    canvas.addEventListener('mousedown', (e) => {
-      startDrawing(e);
-    });
-@@ -186,7 +276,7 @@ <h1>Welcome to Paint App</h1>
-
-    document.getElementById('startButton').addEventListener('click', () => {
-      const homeScreen = document.getElementById('homeScreen');
-      const controls = document.getElementById('controls');
-       const controls = document.getElementById('controls');
-
-      homeScreen.style.display = 'none';
-      controls.style.display = 'flex';
-@@ -196,6 +286,9 @@ <h1>Welcome to Paint App</h1>
-      canvas.height = window.innerHeight;
-    });
-
-    document.getElementById('loginButton').addEventListener('click', handleLogin);
-    document.getElementById('registerLoginButton').addEventListener('click', redirectToRegister);
-
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
- });
-  </script>
 </body>
 </html>

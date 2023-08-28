@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <!-- Add any CSS styles or external CSS links here -->
+  <style>
+   body {
+      margin: 0;
+      padding: 0;
+      font-family: "georgia", cursive;
+      background-color: #b5eaff;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #b5eaff;
+      
+    }
+
+    .box {
+      margin-top: 20px;
+    }
+
+    .box button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .box button:hover {
+      background-color: #45a049;
+    }
+
+    /* Additional styles for the login form */
+    #loginForm {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    #loginForm input {
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 200px;
+    }
+
+    #login-button{
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    #login-button:hover {
+    background-color: #45a049;
+      
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Login</h1>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <br>
+      <input type="submit" value="Login" id="login-button">
+    </form>
+    <p id="loginMessage"></p>
+    <div id="loggedInButtons" style="display: none;">
+      <button onclick="goToDrawingCanvas()">Start Drawing</button>
+    </div>
+    <!-- Add the Register button -->
+    <div class="box">
+      <button onclick="goToRegister()">Register</button>
+    </div>
+  </div>
+
+  <script>
+    // JavaScript Functions
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const enteredUsername = document.getElementById('username').value;
+      const enteredPassword = document.getElementById('password').value;
+
+      // Retrieve stored username and password from local storage
+      const storedUsername = localStorage.getItem('username');
+      const storedPassword = localStorage.getItem('password');
+
+      if (enteredUsername === storedUsername && enteredPassword === storedPassword) {
+        document.getElementById('loginMessage').textContent = 'You are now logged in.';
+        document.getElementById('loggedInButtons').style.display = 'block'; // Show the button
+      } else {
+        document.getElementById('loginMessage').textContent = 'Incorrect username or password.';
+        document.getElementById('loggedInButtons').style.display = 'none'; // Hide the button
+      }
+    });
+
+    function goToRegister() {
+      window.location.href = 'register.html';
+    }
+
+    function goToDrawingCanvas() {
+      window.location.href = 'drawing_canvas.html';
+    }
+  </script>
+</body>
+</html>

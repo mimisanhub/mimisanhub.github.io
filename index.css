@@ -1,113 +1,89 @@
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "georgia", cursive;
-    }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "georgia", cursive;
+}
 
-    #homeScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #b5eaff;
-    }
+#homeScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #b5eaff;
+}
 
-    #canvas {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgb(255, 255, 255);
-      cursor: crosshair;
-    }
+#canvas {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(255, 255, 255);
+  cursor: crosshair;
+}
 
-    #controls {
-      display: none;
-      justify-content: center;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background-color: #e3e3e3;
-      z-index: 1;
-    }
+#controls {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #e3e3e3;
+  z-index: 1;
+}
 
-    #controls select,
-    #controls input {
-      margin: 0 10px;
-    }
+#controls select,
+#controls input {
+  margin: 0 10px;
+}
 
-    #controls label {
-      font-size: 14px;
-      font-weight: bold;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "georgia", cursive;
-    }
+#controls label {
+  font-size: 14px;
+  font-weight: bold;
+}
 
-    #homeScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #b5eaff;
-    }
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #b5eaff;
+}
 
-    #loginContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+.box {
+  margin-top: 20px;
+}
 
-    #loginContainer input {
-      margin-bottom: 10px;
-      padding: 5px;
-      width: 200px;
-    }
+.box button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin: 5px;
+}
 
-    #canvas {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgb(255, 255, 255);
-      cursor: crosshair;
-    }
+.box button:hover {
+  background-color: #45a049;
+}
 
-    #controls {
-      display: none;
-      justify-content: center;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background-color: #e3e3e3;
-      z-index: 1;
-    }
+/* Additional styles for the login form */
+#loginContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
 
-    #controls select,
-    #controls input {
-      margin: 0 10px;
-    }
-
-    #controls label {
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    #controls button {
-      margin: 0 5px;
-    }
+#loginContainer input {
+  margin-bottom: 10px;
+  padding: 5px;
+  width: 200px;
+}

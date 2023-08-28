@@ -7,8 +7,9 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
+            // "name": "Open index.html",
+            // "file": "/Users/mialee/Documents/dev/mimisanhub.github.io/index.html"
+            "url": "https://localhost:8080",
             "webRoot": "${workspaceFolder}"
         }
     ]

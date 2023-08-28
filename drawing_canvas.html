@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Advanced Drawing App</title>
+  <style>
+    #canvas {
+      border: 1px solid black;
+      width: 100vw;
+      height: 600px;
+    }
+    #controls {
+      margin-top: 10px;
+    }
+    ul {
+      display: flex;
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+  <div id="controls">
+    <label for="brushSize">Brush Size:</label>
+    <input type="range" id="brushSize" min="1" max="20" value="5">
+  
+    <label for="brushColor">Brush Color:</label>
+    <input type="color" id="brushColor" value="#000000">
+  
+    <label for="opacity">Opacity:</label>
+    <input type="range" id="opacity" min="0" max="1" step="0.1" value="1">
+  
+    <ul id="tools">
+      <li><button id="eraser">Eraser</button></li>
+      <li><button id="draw">Draw</button></li>
+      <li><button id="fill">Fill</button></li>
+      <li><button id="clear">Clear</button></li>
+      <li><button id="gallery">Save Image</button></li>
+    </ul>
+  </div>
+  
+  <script>
+    // Get the canvas element
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size
+    canvas.width = window.innerWidth;
+    canvas.height = 600;
+    
+    // Variables to store mouse position
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+  
+    // Set initial brush properties
+    let brushSize = 5;
+    let brushColor = '#000000';
+    let opacity = 1;
+    let isEraser = false;
+  
+    // Function to start drawing
+    function startDrawing(e) {
+      isDrawing = true;
+      [lastX, lastY] = [e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop];
+    }
+  
+    // Function to stop drawing
+    function stopDrawing() {
+      isDrawing = false;
+    }
+  
+    // Function to draw lines
+    function draw(e) {
+      if (!isDrawing) return;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      ctx.strokeStyle = isEraser ? 'white' : brushColor;
+      ctx.lineWidth = brushSize;
+      ctx.globalAlpha = opacity;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      [lastX, lastY] = [e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop];
+    }
+  
+    // Function to clear the canvas
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    // Function to fill the canvas
+    function fillCanvas(e) {
+      const startX = e.clientX - canvas.offsetLeft;
+      const startY = e.clientY - canvas.offsetTop;
+      
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const fillColor = hexToRgb(brushColor);
+      
+      const stack = [[startX, startY]];
+      const visited = new Set();
+      
+      while (stack.length > 0) {
+        const [x, y] = stack.pop();
+        const index = (y * canvas.width + x) * 4;
+        
+        if (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
+          if (!visited.has(`${x},${y}`) && isPixelEmpty(imageData, index)) {
+            imageData.data[index] = fillColor.r;
+            imageData.data[index + 1] = fillColor.g;
+            imageData.data[index + 2] = fillColor.b;
+            imageData.data[index + 3] = 255;
+            visited.add(`${x},${y}`);
+            
+            stack.push([x - 1, y]);
+            stack.push([x + 1, y]);
+            stack.push([x, y - 1]);
+            stack.push([x, y + 1]);
+          }
+        }
+      }
+      
+      ctx.putImageData(imageData, 0, 0);
+    }
+    
+    // Helper function to check if a pixel is empty (transparent)
+    function isPixelEmpty(imageData, index) {
+      const r = imageData.data[index];
+      const g = imageData.data[index + 1];
+      const b = imageData.data[index + 2];
+      const a = imageData.data[index + 3];
+      
+      return r === 0 && g === 0 && b === 0 && a === 0;
+    }
+  
+    // Helper function to convert hex color to RGB
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.substring(1), 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      
+      return { r, g, b };
+    }
+  
+    // Event listener for brush size change
+    const brushSizeInput = document.getElementById('brushSize');
+    brushSizeInput.addEventListener('input', function() {
+      brushSize = this.value;
+    });
+  
+    // Event listener for brush color change
+    const brushColorInput = document.getElementById('brushColor');
+    brushColorInput.addEventListener('input', function() {
+      brushColor = this.value;
+    });
+  
+    // Event listener for opacity change
+    const opacityInput = document.getElementById('opacity');
+    opacityInput.addEventListener('input', function() {
+      opacity = this.value;
+    });
+  
+    // Event listener for eraser button
+    const eraserButton = document.getElementById('eraser');
+    eraserButton.addEventListener('click', function() {
+      isEraser = !isEraser;
+      eraserButton.textContent = isEraser;
+    });
+  
+    // Event listener for clear button
+    const clearButton = document.getElementById('clear');
+    clearButton.addEventListener('click', clearCanvas);
+    
+    // Event listener for fill button
+    const fillButton = document.getElementById('fill');
+    fillButton.addEventListener('click', function() {
+      canvas.removeEventListener('mousemove', fillCanvas);
+      canvas.addEventListener('click', fillCanvas);
+    });
+    
+    // Event listener for drawing button
+    const drawButton = document.getElementById('draw');
+    drawButton.addEventListener('click', function() {
+      canvas.removeEventListener('click', draw);
+      canvas.addEventListener('mousemove', draw);
+    });
+  
+    // Event listener for gallery button
+    const galleryButton = document.getElementById('gallery');
+    galleryButton.addEventListener('click', function() {
+      window.location.href = 'gallery.html';
+    });
+  
+    // Attach event listeners to the canvas
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
+
+
+    canvas.getElementById('saveButton').addEventListener('click', () => {
+      const dataURL = canvas.toDataURL();
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'drawing.png';
+      link.click();
+    });
+  </script>
+</body>
+</html>

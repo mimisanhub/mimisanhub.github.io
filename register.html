@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <!-- Add any CSS styles or external CSS links here -->
+  <style>
+    body {
+       margin: 0;
+       padding: 0;
+       font-family: "georgia", cursive;
+       background-color: #b5eaff;
+     }
+ 
+     .container {
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+       height: 100vh;
+       background-color: #b5eaff;
+       
+     }
+
+     #registerForm {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    #registerForm input {
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 200px;
+    }
+
+     #goToLoginButton{
+       padding: 10px 20px;
+       font-size: 16px;
+       background-color: #4caf50;
+       color: white;
+       border: none;
+       cursor: pointer;
+       margin: 5px;
+     }
+
+     #register-button{
+       padding: 10px 20px;
+       font-size: 16px;
+       background-color: #4caf50;
+       color: white;
+       border: none;
+       cursor: pointer;
+       margin: 5px;
+     }
+ 
+     #register-button:hover {
+     background-color: #45a049;
+       
+     }
+   </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Register</h1>
+    <form id="registerForm">
+      <label for="newUsername">Username:</label>
+      <input type="text" id="newUsername" name="newUsername" required>
+      <br>
+      <label for="newPassword">Password:</label>
+      <input type="password" id="newPassword" name="newPassword" required>
+      <br>
+      <input type="submit" value="Register" id="register-button">
+    </form>
+    <p id="registerMessage"></p>
+    <button id="goToLoginButton" onclick="goToLogin()" style="display: none;">Go Back to Login</button>
+  </div>
+
+  <script>
+    // JavaScript Function
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const newUsername = document.getElementById('newUsername').value;
+      const newPassword = document.getElementById('newPassword').value;
+
+      if (newUsername === '' || newPassword === '') {
+        document.getElementById('registerMessage').textContent = 'Please type a username and password.';
+      } else {
+        // Save the newUsername and newPassword to local storage or your backend database
+        // For this example, we'll just store them in the browser's local storage
+        localStorage.setItem('username', newUsername);
+        localStorage.setItem('password', newPassword);
+
+        // Display registration success message
+        document.getElementById('registerMessage').textContent = 'Registration successful! You can now login with your new credentials.';
+
+        // Show the "Go Back to Login" button
+        document.getElementById('goToLoginButton').style.display = 'block';
+        document.getElementById('registerForm').reset(); // Clear the form fields after registration
+      }
+    });
+
+    function goToLogin() {
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
